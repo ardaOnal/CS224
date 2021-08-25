@@ -1,0 +1,234 @@
+## ARDA ONAL 21903350 CS 224-01 Lab01 PART 3 AND PART 4 CODE
+## part3.asm -  Compute the max,min and average of an integer array
+##	
+##	a0 - points to output strings and integers
+##	v0 - variable of syscall
+##	s0 - holds the base address of array
+##	s1 - holds the base address of arraysize
+##	s2 - holds i (loop counter)
+##	s3 - holds the sum
+##	t0 - holds the address counter of array
+##	t1 - holds the address counter of arrsize
+##	t2 - holds arrsize[0] which is the arrsize
+##	t3 - holds the minimum element in array
+##	t4 - holds the maximum element in array
+##
+##
+##
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+	.globl __start 
+	
+__start:
+	la $s0, array	# s0 points to the array
+	la $s1, arrsize	# s1 points to the array
+
+	add $t0, $t0, $s0 # address of array
+	add $t1, $t1, $s1 # address of arrsize
+	lw $t2, 0($t1) # $t2 = arrsize[0]
+	
+	addi $s2, $0, 0 # i = 0
+	
+	addi $s3, $0, 0 # s3 hold the total sum
+	
+	li $v0, 4
+	la $a0, table # printing the table
+	syscall
+	
+	lw $t3, 0($t0) # min = t3 = array[i]
+	lw $t4, 0($t0) # max = t4 = array[i]
+	
+	loop:
+		beq $s2, $t2, exit
+	
+		li $v0, 34
+		move $a0, $t0 # print the address in hexadecimal
+		syscall
+		
+		li $v0, 4
+		la $a0, space # print space
+		syscall
+		
+		li $v0, 1
+		lw $a0, 0($t0) # $a0 = array[i]
+		syscall	
+		
+		blt $t3, $a0, dontsetmin # if min < array[i]
+		move $t3, $a0 # setting the new min
+		dontsetmin: 
+		
+		bgt $t4, $a0, dontsetmax # if max > array[i]
+		move $t4, $a0 # setting the new max
+		dontsetmax: 
+	
+		add $s3, $s3, $a0 # sum = sum + array[i]
+		
+		li $v0, 4
+		la $a0, endl # endl
+		syscall
+		
+		addi $t0, $t0, 4 # address = address + 4
+		addi $s2, $s2, 1 # i = i + 1
+		
+		j loop
+	exit:
+	
+	la $a0, average # print "Average:"
+	li $v0, 4
+	syscall
+	
+	div $a0, $s3, $t2 # average = sum / arrsize
+	li $v0, 1
+	syscall
+	
+	la $a0, endl # print endl
+	li $v0, 4
+	syscall
+	
+	la $a0, max # print "Max:"
+	syscall
+	
+	move $a0, $t4 # print the maximum integer
+	li $v0, 1
+	syscall
+	
+	la $a0, endl # print endl
+	li $v0, 4
+	syscall
+	
+	la $a0, min # print "Min:"
+	syscall
+	
+	move $a0, $t3 # print the minimum integer
+	li $v0, 1
+	syscall
+	
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+.data
+	array: .word 30,82,105,2,3,3,2,9
+	arrsize: .word 8
+	table: .asciiz "Memory Address Array Element\nPosition (hex) Value (int)\n============= ===========\n"
+	average: .asciiz "Average: "
+	min: .asciiz "Min: "
+	max: .asciiz "Max: "
+	space: .asciiz "\t"
+	endl: .asciiz "\n"
+
+##
+## end of file part3.asm
+
+##
+## part4.asm -  Arithmetic expression calculation
+##	
+##	a0 - points to output strings and integers
+##	v0 - reads integers
+##	s0 - holds a
+##	s1 - holds b
+##	s2 - holds c
+##	s3 - holds d
+##	t0 - holds subexpressions of the main experession
+##	t1 - holds subexpressions of the main experession
+##	t2 - holds subexpressions of the main experession
+##	t3 - holds subexpressions of the main experession
+##
+
+#################################
+#					 	#
+#		text segment		#
+#						#
+#################################
+
+	.text		
+	.globl __start 
+	
+__start:		# execution starts here
+	la $v0, 4	# syscall 4 prints the string
+	la $a0, welcomestr
+	syscall
+	
+	la $a0, astr	
+	syscall
+	la $v0, 5	# syscall 5 reads an integer
+	syscall		# get input integer
+	add $s0, $s0, $v0 # put variable a to s0
+	la $v0, 4	# syscall 4 prints the string
+	la $a0, nextlinestr
+	syscall
+	
+	
+	la $a0, bstr
+	syscall
+	la $v0, 5	# syscall 5 reads an integer
+	syscall		# get input integer
+	add $s1, $s1, $v0 # put variable b to s1
+	la $v0, 4	# syscall 4 prints the string
+	la $a0, nextlinestr
+	syscall
+	
+	la $a0, cstr
+	syscall
+	la $v0, 5	# syscall 5 reads an integer
+	syscall		# get input integer
+	add $s2, $s2, $v0 # put variable c to s2
+	la $v0, 4	# syscall 4 prints the string
+	la $a0, nextlinestr
+	syscall
+	
+	la $a0, dstr
+	syscall
+	la $v0, 5	# syscall 5 reads an integer
+	syscall		# get input integer
+	add $s3, $s3, $v0 # put variable d to s3
+	la $v0, 4	# syscall 4 prints the string
+	la $a0, nextlinestr
+	syscall
+	
+	# CALCULATION PART
+	mul $t0, $s2, $s3 # put c*d to t0
+	
+	add $t1, $t1, $s0 # put a to t1 
+	div $t1, $s1	# put the division of a / b to t1
+	mflo $t1	# get the quotient of the division a / b 
+	
+	sub $t0, $t0, $s0 # t0 = c*d - a
+	
+	
+	div $t0, $s1	# t0 / b
+	mfhi $t0	# get the remainder of the division t0 / b
+	
+	add $t4, $t1, $t0 # (A / B) + (C * D - A) % B
+	
+	la $a0, answerstr
+	syscall
+	
+	move $a0, $t4	# put the answer to a0 to print
+	la $v0, 1	# syscall 1 prints the integer
+	syscall
+	
+	
+#################################
+#					 	#
+#     	 data segment		#
+#						#
+#################################
+.data
+	welcomestr:.asciiz "Welcome to this program. Please enter integers a, b, c and d to compute the calculation.\n"
+	astr:.asciiz "Enter a:"
+	bstr:.asciiz "Enter b:"
+	cstr:.asciiz "Enter c:"
+	dstr:.asciiz "Enter d:"
+	nextlinestr: .asciiz "\n"
+	answerstr: .asciiz "The answer for the equation X = (A / B) + (C * D - A) % B is "
+
+##
+## end of file part4.asm
