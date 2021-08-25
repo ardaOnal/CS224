@@ -1,0 +1,28 @@
+// Code your testbench here
+// or browse Examples
+
+module testbench;
+  
+  initial begin
+ 	$dumpfile("dump.vcd");
+	$dumpvars(1);
+   end
+  
+  logic clk, reset, memwrite, alusrca, alusrcb, regwrite, branch, pcsrc, zero;
+  
+  reg [1:0] memtoreg, aluop, regdst;
+  reg [31:0] pc, instr, readdata, writedata, dataadr;
+
+  new_top topmodule( clk, reset, memwrite, alusrca, alusrcb, regwrite, jump, branch, memtoreg, aluop, regdst, pc, instr, readdata, writedata, dataadr, pcsrc, zero);
+  
+  initial begin
+    clk <= 0;
+    reset <= 1; #10
+    reset <= 0;
+ 	for(int i = 0; i < 100; i++)
+ 	begin
+ 		#10; clk = ~clk;
+ 	end
+  end
+  
+endmodule
